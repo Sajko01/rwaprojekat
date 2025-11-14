@@ -3,7 +3,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: sajko
-      POSTGRES_PASSWORD: sajko123
+      POSTGRES_PASSWORD: ********
       POSTGRES_DB: rwaprojekat1
     ports:
       - "5432:5432"
