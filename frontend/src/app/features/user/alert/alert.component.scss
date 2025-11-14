@@ -1,0 +1,35 @@
+.alert-dialog {
+    background-color: white;  
+    color: #333;  
+    border-radius: 8px; 
+    padding: 20px;  
+    width: 400px;  
+    display: flex;  
+    flex-direction: column; 
+    align-items: center;  
+    justify-content: center;  
+    text-align: center;  
+  }
+  
+  .alert-title {
+    color: green;  
+    margin-bottom: 10px;  
+  }
+  
+  .alert-content {
+    font-size: 16px;  
+    margin-bottom: 20px;  
+  }
+  
+  .alert-button {
+    background-color: green;  
+    color: white;  
+    border-radius: 5px;  
+    padding: 10px 20px;  
+    transition: background-color 0.3s;  
+  }
+  
+  .alert-button:hover {
+    background-color: darkgreen;  
+  }
+  

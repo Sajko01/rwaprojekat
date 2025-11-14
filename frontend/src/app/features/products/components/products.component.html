@@ -1,0 +1,237 @@
+<header class="site-header">
+  <div class="logo-container">
+
+    <img src="/assets/logo.png" alt="EkoVrt Logo" class="logo">
+    <h1 class="site-title">EkoVrt</h1>
+  </div>
+  <p class="site-slogan">Dobrodošli u EkoVrt – Vaš pouzdani partner za najlepši vrt</p>
+
+  
+
+   
+  <p class="site-description">Naručite biljke, usluge i vrtni materijal iz jednog mesta</p>
+  <button class="cta-button" (click)="scrollToProducts()">Pregledajte Proizvode</button>
+  
+
+</header>
+
+
+
+<div class="testimonials">
+  <h2 class="testimonial-title"> Proizvodni tim vode</h2>
+  <div class="testimonial-card">
+    <p class="testimonial-name"> Suzana Jovanović</p>
+    <p class="testimonial-quote">"Master ekonomista, ali i iskusni agronom specijalizovan za hortikulturnu proizvodnju,
+       uključujući sezonsko i višegodišnje, kao i zimzeleno bilje. Kroz pažljiv odabir biljaka i prilagođene tehnike održavanja, 
+       sa svojim timom zaposlenih proizvodi sve najbolje vrste cveća za klijente."</p>
+    
+  </div>
+  <div class="testimonial-card">
+    <p class="testimonial-name"> Ivana Jovanović</p>
+    <p class="testimonial-quote">"Diplomirani politikolog i iskusni vodič marketinga našeg tima. Uključuje se u nabavku  
+     semenog materijala biljaka i trave, kao i malča i ukrasnih kamenčića. Glavni je izvor kreativnosti, atrakcija 
+     i inovacija unutar našeg tima."</p>
+    
+  </div>
+</div>
+
+
+ 
+<div class="search-container" id="products-section">
+  <div class="search-fields">
+    <div class="field">
+      <label for="product-type" class="type-label">Pretraži proizvode po vrsti</label>
+      <select id="product-type" 
+              [ngModel]="selectedType$ | async" 
+              (ngModelChange)="selectedType$.next($event)"
+              class="type-select">
+        <option value="">Sve vrste</option>
+        <option *ngFor="let type of uniqueTypes$ | async" [value]="type">{{ type }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="search-term" class="type-label">Pretraži proizvode po imenu</label>
+      <input id="search-term"
+             type="text"
+             class="type-select"
+             placeholder="Unesite naziv proizvoda..."
+             [ngModel]="searchTerm$ | async"
+             (ngModelChange)="searchTerm$.next($event)" />
+    </div>
+  </div>
+</div>
+
+
+<div class="backgr">
+
+  <div class="product-container" *ngIf="filteredProducts$ | async as filteredProducts">
+    <div class="product" *ngFor="let product of filteredProducts">
+
+    <img [src]="getImageUrl(product.image)" alt="{{ product.name }}" class="product-image">
+    <h2 class="product-name">{{ product.name }}</h2>
+    <p class="product-type">{{ product.type }}</p>
+
+    <div class="product-info">
+      <div class="product-quantity"  *ngIf="product.quantity!=0 ;else quantityZero">
+        <p>Dostupno: {{ product.quantity }}</p>
+      </div>
+
+      <ng-template #quantityZero>
+    <p>RASPRODATO!</p>
+  </ng-template>
+
+      <div class="product-price">
+        <p>{{ product.price  }} RSD</p>
+      </div>
+
+      
+
+      <ng-container *ngIf="(isLoggedIn$ | async)">
+      <ng-container *ngIf="(userRole$ | async) === 'user'; else adminTemplate"> 
+      <div class="quantity-section">
+        <label for="quantity-{{product.id}}">Količina:</label>
+        <input type="number" id="quantity-{{product.id}}" [(ngModel)]="tempQuantities[product.id]" min="1" value="1" [attr.max]="product.quantity"/>
+      </div>
+
+      
+      <button 
+        (click)="addToCart(product)" 
+        class="add-to-cart-btn" 
+        [disabled]="productsInCart[product.id] || product.quantity===0 || tempQuantities[product.id] < 1">
+        Dodaj u korpu
+      </button>
+
+
+      <button 
+        (click)="deleteCartItems(product.id)" 
+        [disabled]="!productsInCart[product.id]"
+        class="remove-from-cart-btn">
+        Izbaci iz korpe
+      </button>
+
+  
+    </ng-container>
+    <ng-template #adminTemplate>
+
+
+
+      <div class="quantity-section">
+        <label for="quantity-{{product.id}}">Količina:</label>
+        <input
+          type="number"
+          [(ngModel)]="tempQuantities[product.id]"
+          min="1"
+          value="1"
+        />
+      </div>
+      
+      <button
+        (click)="updateQuantity(product.id, tempQuantities[product.id])"
+        class="add-to-cart-btn"
+        [disabled]="tempQuantities[product.id] === product.quantity"
+      >
+        Ažuriraj količinu
+      </button>
+      
+
+      <div class="quantity-section">
+        <label for="quantity-{{product.id}}">Cena:</label>
+        <input type="number"  [(ngModel)]="tempPrices[product.id]" min="1" value="1" />
+      </div>
+
+
+      <button 
+        (click)="updatePrice(product.id,tempPrices[product.id])" 
+        [disabled]="tempPrices[product.id]==product.price"
+        class="remove-from-cart-btn">
+        Ažuriraj cenu
+      </button>
+
+      <button mat-button (click)="openConfirmDialog(product.id)" class="remove-from-cart-btn">Obriši proizvod</button>
+
+
+
+
+    </ng-template>
+
+    </ng-container>
+    
+    
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+<ng-container *ngIf="!(isLoggedIn$ | async);else Loged">
+  <div class="login">
+<p class="login-description">Ukoliko želite da poručite naše proizvode, prijavite se klikom na dugme ispod</p>
+<button class="login-cta-button" (click)="scrollToUsers()">Prijavite se</button>
+</div>
+
+</ng-container>
+
+<ng-template #Loged>
+  <ng-container class="container-add"*ngIf="(userRole$ | async) === 'admin'">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+      <div class="formName-group">
+        <label for="name" class="formName-label">Dodajte nove proizvode</label>
+
+      </div>
+      <div class="form-group">
+        <label for="name" class="form-label">Naziv proizvoda</label>
+        <input id="name" type="text" formControlName="name" class="form-input" />
+        <div *ngIf="productForm.controls['name'].invalid && productForm.controls['name'].touched" class="error-message">
+          Unesite ispravan naziv (min 1 karaktera).
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label for="type" class="form-label">Tip proizvoda</label>
+        <input id="type" type="text" formControlName="type" class="form-input" />
+        <div *ngIf="productForm.controls['type'].invalid && productForm.controls['type'].touched" class="error-message">
+          Unesite tip proizvoda (min 1 karaktera).
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label for="price" class="form-label">Cena</label>
+        <input id="price" type="number" formControlName="price" class="form-input" />
+        <div *ngIf="productForm.controls['price'].invalid && productForm.controls['price'].touched" class="error-message">
+          Unesite ispravnu cenu (ne može biti negativna).
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label for="quantity" class="form-label">Količina</label>
+        <input id="quantity" type="number" formControlName="quantity" class="form-input" min="0" step="1" />
+        <div *ngIf="productForm.controls['quantity'].invalid && productForm.controls['quantity'].touched" class="error-message">
+          Unesite ispravnu količinu (pozitivan ceo broj).
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <label for="image" class="form-label">Slika proizvoda</label>
+        <input id="image" type="file" (change)="onFileSelected($event)" class="form-input" />
+        <div *ngIf="!selectedImage && productForm.controls['image'].touched" class="error-message">
+          Odaberite sliku.
+        </div>
+      </div>
+    
+      <button type="submit" [disabled]="productForm.invalid" class="cta-form-button">Dodaj proizvod</button>
+    </form>
+  </ng-container>
+</ng-template>
+
+<div *ngIf="(filteredProducts$ | async) as fp">
+<div *ngIf="!fp.length">
+  <p>No products found.</p>
+</div>
+</div>
+
+
+
+

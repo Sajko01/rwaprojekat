@@ -1,0 +1,52 @@
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  background-color: #3f51b5;
+  color: white;
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  z-index: 1000; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+.aplName {
+  text-decoration: none;
+  color: rgb(196, 255, 196); 
+  
+
+  &:hover {
+    color: yellow; 
+  }
+
+  &:active {
+    color: red; 
+    transition: color 0.09s; 
+  }
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.header-links {
+  text-decoration: none;
+  color: rgb(196, 255, 196);;
+
+  &:hover {
+    color: yellow; 
+  }
+
+  &:active {
+    color: red; 
+    transition: color 0.09s; 
+  }
+}
+

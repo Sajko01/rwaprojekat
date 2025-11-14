@@ -1,0 +1,190 @@
+
+  <header class="site-header">
+    <div class="header-content">
+      <h1 class="header-title">Uživajte u našim uslugama</h1>
+     
+    </div>
+
+    <div class="header-content">
+    <p class="header-description">Ovde možete pregledati i poručiti naše usluge. Naš tim stručnjaka je ovde da vam pomogne da vaš vrt izgleda savršeno. Posvećeni smo stvaranju prostora koji inspirišu i raduju!</p>
+    
+     <button class="cta-button" (click)="scrollToServices()">Pregledajte Usluge</button>
+    </div>
+
+    <div class="image-slider">
+    
+      <img [src]="currentImage" alt="Uređeno dvorište" class="slider-image">
+     
+    </div>
+
+    <div class="testimonials">
+      <h2 class="testimonial-title">Uslužni tim vode</h2>
+      <div class="testimonial-card">
+        <p class="testimonial-name"> Momčilo Jovanović</p>
+        <p class="testimonial-quote">"Iskusni agronom specijalizovan za hortikulturne usluge, uključujući sejanje trave, orezivanje jelki,
+           sadnju biljaka, malčiranje i još mnogo toga. Kroz pažljiv odabir biljaka i prilagođene tehnike održavanja, 
+           pomaže klijentima da njihovi vrtovi budu estetski privlačni i zdravi tokom cele godine."</p>
+        
+      </div>
+      <div class="testimonial-card">
+        <p class="testimonial-name"> Aleksandar Jovanović</p>
+        <p class="testimonial-quote">"Diplomirani inženjer agrokulture sa fokusom na usluge uređenja zelenih površina. 
+          Specijalizuje se za sadnju i održavanje biljaka, orezivanje drveća,
+           postavljanje sistema za malčiranje i sejanje travnjaka, pružajući 
+           rešenja koja kombinuju funkcionalnost i prirodnu lepotu svakog prostora."</p>
+        
+      </div>
+    </div>
+
+    <section class="services-section" id="services">
+      <h2 class="services-title">Napomene!</h2>
+      <div class="service-cards">
+        <div class="service-card">
+          <i class="fas fa-seedling service-icon"></i>
+          <h3 class="service-name">Cene usluga</h3>
+          <p class="service-description">Cena orezivanja jelki i sadnje biljaka su po komadu, dok su ostale cene po kvadratnoj površini.</p>
+        </div>
+
+        <div class="service-card">
+          <i class="fas fa-seedling service-icon"></i>
+          <h3 class="service-name">Usluge i materijal</h3>
+          <p class="service-description">Naše usluge ne podrazumevaju da koristite naš materijal! Ukoliko se odlučite da i materijal bude naš 
+            obavezno dodajte i odgovarajuću količinu tog proizvoda u korpu!</p>
+        </div>
+        
+       
+      </div>
+    </section>
+    
+  </header>
+
+
+  <div class="backgr">
+
+  <div class="service-container" *ngIf="(services$ | async)?.length" id="services-section">
+    <div class="service" *ngFor="let service of services$ | async">
+      <img [src]="getImageUrl(service.image)" alt="{{ service.name }}" class="service-image">
+      <h2 class="service-name">{{ service.name }}</h2>
+      <span 
+  (click)="openServiceDialog(service.description,service.name)" 
+  style="cursor: pointer; color: blue; transition: color 0.3s;" 
+  (mouseenter)="isHovering = true" 
+  (mouseleave)="isHovering = false"
+  [ngStyle]="{'color': isHovering ? 'blue' : 'green'}">
+  O usluzi
+</span>
+      
+      <div class="service-info">
+        <div class="service-price">
+          <p>{{ service.pricePerUnit }} RSD</p>
+        </div>
+        
+        <ng-container *ngIf="(isLoggedIn$ | async);">
+          <ng-container *ngIf="(userRole$ | async) === 'user'; else adminTemplate"> 
+        <div class="quantity-section">
+          <label for="quantity-{{service.id}}">Količina:</label>
+          <input type="number" id="quantity-{{service.id}}" [(ngModel)]="tempQuantities[service.id]" min="1" value="1" /> 
+         
+        </div>
+  
+      
+        <button (click)="addToCart(service)"
+         class="add-to-cart-btn"
+         [disabled]="servicesInCart[service.id] || tempQuantities[service.id] < 1">
+          Dodaj u korpu
+        </button>
+  
+        
+        <button 
+          (click)="deleteCartItems(service.id)" 
+          [disabled]="!servicesInCart[service.id]"
+          class="remove-from-cart-btn">
+          Izbaci iz korpe
+        </button>
+      </ng-container>
+      <ng-template #adminTemplate>
+
+        <div class="quantity-section">
+          <label for="quantity-{{service.id}}">Cena:</label>
+          <input type="number"  [(ngModel)]="tempPrices[service.id]" min="1" value="1" />
+        </div>
+  
+  
+        <button 
+          (click)="updatePrice(service.id,tempPrices[service.id])" 
+          [disabled]="tempPrices[service.id]==service.pricePerUnit"
+          class="remove-from-cart-btn">
+          Ažuriraj cenu
+        </button>
+
+        <button mat-button (click)="openConfirmDialog(service.id)" class="remove-from-cart-btn">Obriši uslugu</button>
+
+
+      </ng-template>
+
+      </ng-container>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+  <ng-container *ngIf="!(isLoggedIn$ | async);else Loged">
+    <div class="login">
+  <p class="login-description">Ukoliko želite da poručite naše usluge, prijavite se klikom na dugme ispod</p>
+  <button class="login-cta-button" (click)="scrollToUsers()">Prijavite se</button>
+  </div>
+  
+  </ng-container>
+  <ng-template #Loged>
+    <ng-container *ngIf="(userRole$ | async) === 'admin'">
+      <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form">
+        <div class="formName-group">
+          <label for="name" class="formName-label">Dodajte novu uslugu</label>
+        </div>
+        
+        <div class="form-group">
+          <label for="name" class="form-label">Naziv usluge</label>
+          <input id="name" type="text" formControlName="name" class="form-input" />
+          <div *ngIf="serviceForm.controls['name'].invalid && serviceForm.controls['name'].touched" class="error-message">
+            Unesite ispravan naziv (min 1 karaktera).
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <label for="pricePerUnit" class="form-label">Cena po jedinici</label>
+          <input id="pricePerUnit" type="number" formControlName="pricePerUnit" class="form-input" />
+          <div *ngIf="serviceForm.controls['pricePerUnit'].invalid && serviceForm.controls['pricePerUnit'].touched" class="error-message">
+            Unesite ispravnu cenu (ne može biti negativna).
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <label for="description" class="form-label">Opis</label>
+          <textarea id="description" formControlName="description" class="form-input"></textarea>
+          <div *ngIf="serviceForm.controls['description'].invalid && serviceForm.controls['description'].touched" class="error-message">
+            Unesite opis.
+          </div>
+        </div>
+      
+        <div class="form-group">
+          <label for="image" class="form-label">Slika usluge</label>
+          <input id="image" type="file" (change)="onFileSelected($event)" class="form-input" />
+          <div *ngIf="!selectedImage && serviceForm.controls['image'].touched" class="error-message">
+            Odaberite sliku.
+          </div>
+        </div>
+      
+        <button type="submit" [disabled]="serviceForm.invalid" class="cta-form-button">Dodaj uslugu</button>
+      </form>
+    </ng-container>
+  </ng-template>
+  
+
+  <div *ngIf="!(services$ | async)?.length">
+    <p>No services found.</p>
+  </div>
+  
+
+
+  

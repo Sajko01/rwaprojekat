@@ -1,0 +1,99 @@
+<div class="backgr" id="user-section">
+  <div class="container">
+  <div *ngIf="!(isLoggedIn$ | async)">
+    <div class="welcome-message">
+      <h2>Dobrodošli u našu zajednicu!</h2>
+      <p>
+        Bilo da se prijavljujete ili pravite novi nalog, radujemo se što postajete deo našeg sveta. 
+        Nudimo vam personalizovano iskustvo i najbolje usluge.
+      </p>
+    </div>
+
+    <h1 *ngIf="isLogin">Prijavite se na svoj nalog</h1>
+    <h1 *ngIf="!isLogin">Kreirajte novi nalog</h1>
+
+    <form (submit)="onSubmit()" class="user-form">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" [(ngModel)]="userDto.email" name="email" required />
+      </div>
+
+      <div class="form-group" *ngIf="!isLogin">
+        <label for="nick">Nadimak:</label>
+        <input type="text" id="nick" [(ngModel)]="userDto.nick" name="nick" required />
+      </div>
+
+      <div class="form-group" *ngIf="!isLogin">
+        <label for="address">Adresa:</label>
+        <input type="text" id="address" [(ngModel)]="userDto.address" name="address" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Lozinka:</label>
+        <input type="password" id="password" [(ngModel)]="userDto.password" name="password" required />
+      </div>
+
+      <button type="submit" class="btn">{{ isLogin ? 'Prijavi me' : 'Napravi nalog' }}</button>
+      
+      <button type="button" class="btn toggle-btn" (click)="toggleForm()">
+        {{ isLogin ? 'Nemate nalog? Napravite nalog' : 'Već imate nalog? Prijavite se' }}
+      </button>
+    </form>
+  </div>
+
+
+
+
+  <div  *ngIf="(isLoggedIn$ | async)">
+    
+  
+    <div  class="container"  class="update-location-form">
+      <div class="welcome-message">
+        
+        <ng-container *ngIf="(userRole$ | async) === 'user'; else adminTemplate" >
+          <h2>Prijavljeni ste!</h2>
+        
+        <p>Adresa na kojoj se vrši isporuka:</p>
+        <h2 *ngIf="location$ | async as locationData">
+          {{ locationData.location }}
+        </h2>
+        <p>
+          
+          Ukoliko se vaša lokacija isporuke razlikuje od trenutne lokacije, onda ažurirajte vašu lokaciju! 
+          
+        </p>
+
+      </ng-container>
+      <ng-template #adminTemplate>
+
+        <h2>Prijavljeni ste kao admin!</h2>
+   
+      </ng-template>
+       
+      </div>
+
+      
+      <ng-container *ngIf="(userRole$ | async) === 'user'" >
+      <h2 >Ažurirajte lokaciju porudžbine</h2>
+      
+      <form (submit)="onLocationUpdate()" class="location-form">
+        <div class="form-group">
+          <label for="newLocation">Nova adresa:</label>
+          <input type="text" id="newLocation" [(ngModel)]="newLocation" name="newLocation" required />
+        </div>
+        
+        <button type="submit" class="btn">Ažuriraj lokaciju</button>
+      </form>
+    </ng-container>
+    </div>
+  
+    
+
+    <button (click)="logout()" class="btn logout-btn">Odjavi se</button>
+  </div>
+
+
+  </div>
+
+</div>
+  

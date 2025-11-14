@@ -1,0 +1,118 @@
+<div class="order-header">
+  
+<ng-container *ngIf="(orders$ | async) as orders; ">
+  <div *ngIf="orders.length > 0; else noOrders" >
+  <h1 class="order-header-title" *ngIf="(userRole$ | async) === 'user'">Vaše porudžbine</h1>
+  <h1 class="order-header-title" *ngIf="(userRole$ | async) === 'admin'">Porudžbine</h1>
+  <p class="order-header-description" *ngIf="(userRole$ | async) === 'user'" >
+     NAPOMENA: Porudžbinu možete obrisati unutar intervala od 5 minuta nakon poručivanja.
+    
+   </p>
+
+</div>
+ 
+</ng-container>
+
+<ng-template #noOrders >
+  
+
+    <h1 class="order-header-title" *ngIf="(userRole$ | async) === 'user'">Još uvek nemate porudžbine!</h1>
+    <h1 class="order-header-title" *ngIf="(userRole$ | async) === 'admin'">Još uvek nema porudžbina!</h1>
+    <p class="order-header-description" *ngIf="(userRole$ | async) === 'user'">
+     Za poručivanje dodajte proizvode ili usluge u korpu i kliknete na dugme "Potvrdite porudžbinu" na stranici "Korpa".
+     
+    </p>
+
+
+</ng-template>
+  
+
+
+
+
+  
+
+</div>
+
+
+
+
+<div class="backgr">
+
+
+
+<div class="orders-container" *ngIf="(userRole$ | async) === 'user'">
+  <div *ngFor="let order of (orders$ | async)" class="order">
+    <p>Datum porudžbine: {{ order.orderDate | date: 'medium' }}</p>
+    <p>Ukupna cena: {{ order.totalPrice }} RSD</p>
+    <p>Lokacija porudžbine: {{ order.orderLocation }}</p>
+    <p *ngIf="order.orderInfo != null">Napomena: {{ order.orderInfo }}</p>
+
+    <div class="order-item" *ngFor="let item of order.orderItems">
+      <ng-container *ngIf="item.product; else serviceTemplate">
+        <img [src]="getImageUrl(item.product.image)" alt="{{ item.product.name }}" class="order-item-image">
+        <h4 class="order-item-name">{{ item.product.name }}</h4>
+        <p class="order-item-type">{{ item.product.type }}</p>
+        <p class="order-item-quantity">Količina: {{ item.quantity }}</p>
+        <p class="order-item-price">{{ item.product.price }} RSD</p>
+      </ng-container>
+
+      <ng-template #serviceTemplate>
+        <ng-container *ngIf="item.service">
+          <img [src]="getImageUrl(item.service.image)" alt="{{ item.service.name }}" class="order-item-image">
+          <h4 class="order-item-name">{{ item.service.name }}</h4>
+          <p class="order-item-description">{{ item.service.description }}</p>
+          <p class="order-item-quantity">Količina: {{ item.quantity }}</p>
+          <p class="order-item-price">{{ item.service.pricePerUnit }} RSD</p>
+        </ng-container>
+        <ng-container *ngIf="!item.service"> 
+          <p>Servis nije dostupan.</p>
+        </ng-container>
+      </ng-template>
+      
+    </div>
+    <button class="confirm-order-btn" *ngIf="canDeleteOrder(order.orderDate)" (click)="deleteOrder(order.id)">
+      Obriši porudžbinu
+    </button>
+  </div>
+</div>
+
+<div class="orders-container" *ngIf="(userRole$ | async) === 'admin'">
+  <div *ngFor="let adminOrder of (ordersAdmin$ | async)" class="order">
+    <p>Datum porudžbine: {{ adminOrder.orderDate | date: 'medium' }}</p>
+    <p>Ukupna cena: {{ adminOrder.totalPrice }} RSD</p>
+    <p>Lokacija porudžbine: {{ adminOrder.orderLocation }}</p>
+    <p>E-mail kupca: {{ adminOrder.user.email }}</p>
+    <p *ngIf="adminOrder.orderInfo != null">Napomena: {{ adminOrder.orderInfo }}</p>
+
+    <div class="order-item" *ngFor="let item of adminOrder.orderItems">
+      <ng-container *ngIf="item.product; else adminServiceTemplate">
+        <img [src]="getImageUrl(item.product.image)" alt="{{ item.product.name }}" class="order-item-image">
+        <h4 class="order-item-name">{{ item.product.name }}</h4>
+        <p class="order-item-type">{{ item.product.type }}</p>
+        <p class="order-item-quantity">Količina: {{ item.quantity }}</p>
+        <p class="order-item-price">{{ item.product.price }} RSD</p>
+      </ng-container>
+
+      <ng-template #adminServiceTemplate>
+        <ng-container *ngIf="item.service">
+          <img [src]="getImageUrl(item.service.image)" alt="{{ item.service.name }}" class="order-item-image">
+          <h4 class="order-item-name">{{ item.service.name }}</h4>
+          <p class="order-item-description">{{ item.service.description }}</p>
+          <p class="order-item-quantity">Količina: {{ item.quantity }}</p>
+          <p class="order-item-price">{{ item.service.pricePerUnit }} RSD</p>
+        </ng-container>
+        <ng-container *ngIf="!item.service"> 
+          <p>Servis nije dostupan.</p>
+        </ng-container>
+      </ng-template>
+      
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+
+

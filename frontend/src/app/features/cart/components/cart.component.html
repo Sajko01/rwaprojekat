@@ -1,0 +1,187 @@
+<div class="cart-header">
+  <ng-container *ngIf="!(cartIsEmpty$ | async) && !(orderMaked$ | async) ; else emptyCart">
+  <h1 class="cart-header-title">Vaša trenutna korpa</h1>
+  <p class="cart-header-description">
+    Možete izmeniti količinu ili izbaciti  iz korpe proizvode i usluge
+   
+  </p>
+</ng-container>
+
+<ng-template #emptyCart >
+  <ng-container *ngIf="(orderMaked$ | async) ;else notMaked">
+
+    <h1 class="cart-header-title">Vaša porudžbina je primljena.</h1>
+    <p class="cart-header-description">
+      Hvala na poverenju!
+      
+     </p>
+    <p class="cart-header-description">
+     Možete je pregledati klikom na dugme ispod ili na stranici "Porudžbine".
+     
+    </p>
+
+    <button class="cta-button" (click)="scrollToOrders()">Pregledajte Porudžbinu</button>
+
+
+  </ng-container>
+  <ng-template #notMaked >
+
+  <h1 class="cart-header-title">Vaša korpa je prazna</h1>
+  <p class="cart-header-description">
+   Možete dodati proizvode ili usluge u korpu, čekamo Vas.
+   
+  </p>
+
+  <button class="cta-button" (click)="scrollToProducts()">Pregledajte Proizvode</button>
+  <button class="cta-button" (click)="scrollToServices()">Pregledajte Usluge</button>
+
+
+</ng-template>
+</ng-template>
+
+</div>
+
+    <div class="backgr">
+      <div class="cart-container">
+
+    <div class="cart-item-container" *ngIf="cartItems$"> 
+
+        <div class="cart-item" *ngFor="let cartItem of cartItems$ | async">
+        <ng-container *ngIf="cartItem.product; else serviceTemplate">
+          <img [src]="getImageUrl(cartItem.product.image)" alt="{{ cartItem.product.name }}" class="cart-item-image">
+          <h2 class="cart-item-name">{{ cartItem.product.name }}</h2>
+          <p class="cart-item-type">{{ cartItem.product.type }}</p>
+          <div class="cart-item-info">
+            <div class="cart-item-quantity">
+              <p>Količina: {{ cartItem.quantity }}</p>
+            </div>
+            <div class="cart-item-price">
+              <p>{{ cartItem.product.price}} RSD</p>
+            </div>
+
+            
+
+           
+
+           
+            <div class="quantity-section">
+              <input
+                type="number"
+                [(ngModel)]="tempQuantities[cartItem.id]"
+                min="1"
+                [attr.max]="cartItem.product.quantity"
+                value="1"
+              />
+            </div>
+          
+            <button
+              (click)="updateQuantity(cartItem.id, tempQuantities[cartItem.id])"
+              class="add-to-cart-btn"
+              [disabled]="tempQuantities[cartItem.id] === cartItem.quantity"
+            >
+              Ažuriraj količinu
+            </button>
+
+            <button 
+            (click)="deleteCartItems(cartItem.product.id,true)" 
+            class="remove-from-cart-btn">
+            Izbaci iz korpe
+          </button>
+          </div>
+        </ng-container>
+
+        <ng-template #serviceTemplate>
+          <ng-container *ngIf="cartItem.service">
+            <img [src]="getImageUrl(cartItem.service.image)" alt="{{ cartItem.service.name }}" class="cart-item-image">
+            <h2 class="cart-item-name">{{ cartItem.service.name }}</h2>
+            <p class="cart-item-description">Usluga</p>
+            <div class="cart-item-info">
+              <div class="cart-item-quantity">
+                <p>Količina: {{ cartItem.quantity }}</p>
+              </div>
+              <div class="cart-item-price">
+                <p>{{ cartItem.service.pricePerUnit }} RSD</p>
+              </div>
+
+              <div class="quantity-section">
+                <input
+                  type="number"
+                  [(ngModel)]="tempQuantities[cartItem.id]"
+                  min="1"
+                  [attr.max]="cartItem.service.quantityToAdd"
+                  value="1"
+                />
+              </div>
+            
+              <button
+                (click)="updateQuantity(cartItem.id, tempQuantities[cartItem.id])"
+                class="add-to-cart-btn"
+                [disabled]="tempQuantities[cartItem.id] === cartItem.quantity"
+              >
+              
+                Ažuriraj količinu
+              </button>
+
+              <button 
+                (click)="deleteCartItems(cartItem.service.id,false)" 
+                class="remove-from-cart-btn">
+                Izbaci iz korpe
+              </button>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!cartItem.service"> 
+            <p>Servis nije dostupan.</p>
+          </ng-container>
+        </ng-template>
+
+        
+     
+        
+      </div>
+
+  
+
+    </div>
+     
+  
+  
+    <ng-container *ngIf="!(orderMaked$ | async); else orderTemplate">
+      <ng-container *ngIf="!(cartIsEmpty$ | async)">
+
+
+        <div class="additional-notes">
+          <input 
+            type="text" 
+            id="orderInfo" 
+            [(ngModel)]="orderInfo" 
+            placeholder="(Opciono) Unesite dodatne napomene o porudžbini..." 
+          />
+        </div>
+
+      
+<button 
+  class="confirm-order-btn" 
+  (click)="submitOrder()" 
+  [disabled]="isSubmitting || (cartIsEmpty$ | async)">
+  {{ isSubmitting ? 'Vaša porudžbina se sprema!' : 'Potvrdite porudžbinu' }}
+</button>
+
+
+    
+   
+  </ng-container>
+
+
+  
+
+  </ng-container>
+  <ng-template #orderTemplate>
+  </ng-template>
+  </div>
+</div>
+
+
+
+
+
+

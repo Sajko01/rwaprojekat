@@ -1,0 +1,28 @@
+<mat-toolbar>
+
+  <ng-container *ngIf="(isLoggedIn$ | async); else notLoggedIn">
+    <span class="aplName" *ngIf="(userRole$ | async) === 'user'">Dobrodošli, {{ userNick$ | async }}!</span>
+    <span class="aplName" *ngIf="(userRole$ | async) === 'admin'">Admin: {{ userNick$ | async }}</span>
+  </ng-container>
+  <ng-template #notLoggedIn>
+    <span class="aplName">{{ appName }}</span>
+  </ng-template>
+  
+  
+  <span class="spacer"></span>
+
+
+  <ng-container *ngFor="let link of links">
+    <ng-container *ngIf="!link.requiresAuth || (isLoggedIn$ | async)">
+
+      <ng-container *ngIf="link.label !== 'Korpa' || !((userRole$ | async)=== 'admin')">
+
+      <a [routerLink]="link.route" class="header-links" (click)="scrollToTop()">{{ link.label }}</a>
+    </ng-container>
+  </ng-container>
+
+  </ng-container>
+</mat-toolbar>
+
+
+   

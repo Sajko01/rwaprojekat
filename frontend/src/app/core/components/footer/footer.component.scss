@@ -1,0 +1,60 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;  
+  }
+  
+  main {
+    flex: 1; 
+  }
+  
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    background-color: #3f51b5;
+    color: rgb(196, 255, 196); 
+    padding: 10px 20px;
+    text-align: center;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); 
+    margin-top: auto; 
+    padding: 10px 20px; 
+  }
+  
+  a {
+    color: rgb(196, 255, 196); 
+    text-decoration: none;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+  
+    &:hover {
+      color: yellow;
+    }
+    
+  &:active {
+    color: red; 
+    transition: color 0.09s; 
+  }
+    mat-icon {
+        margin-right: 5px;
+      }
+  }
+  
+
+  .contact-info,
+  .social-media {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
